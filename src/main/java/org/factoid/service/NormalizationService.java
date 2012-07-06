@@ -38,24 +38,27 @@ public class NormalizationService {
 				url.openStream()));
 		while (br.ready()) {
 			String line = br.readLine();
-			if (!line.matches("^\\s*#.+$")) {
+			if (!line.matches("^\\s*#.+$")) { // must not be a commented line
 				String[] cols = line.split("\t");
 				
 				if( "".equals( cols[0] ) || "".equals( cols[1] ) ){
 					continue;
 				}
 				
+				// columns
+				// id    annotation-type    offset    type    code    score    docid    literal
+				// 0     1                  2         3       4       5        6        7
+				
 				String id = cols[0];
-				int start = Integer.parseInt(cols[1]);
-				int end = Integer.parseInt(cols[2]);
-				String annotationTypes = cols[3];
-				String literal = cols[4];
-				String type = cols[5];
+				int start = Integer.parseInt(cols[2]);
+				String literal = cols[7];
+				int end = start + literal.length();
 
 				Match match = new Match();
 				match.setStart(start);
-				match.setEnd(end + 1);
+				match.setEnd(end);
 				match.setString(literal);
+				
 				sortedMatches.add(match);
 			}
 		}
