@@ -30,43 +30,108 @@ public class NormalizationService {
 		List<Match> matches = new LinkedList<Match>();
 		Set<Match> sortedMatches = new TreeSet<Match>();
 
-		URL url = new URL(
-				"http://factoid.bioinfo.cnio.es/Factoid/abner?_format=raw&docid="
-						+ docid);
+		URL url = new URL("http://factoid.bioinfo.cnio.es/Factoid/abner");
+		URLConnection urlConn;
+		DataOutputStream printout;
+		DataInputStream input;
+		BufferedReader br;
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(
-				url.openStream()));
+		// URL connection channel.
+		urlConn = url.openConnection();
+
+		// Let the run-time system (RTS) know that we want input.
+		urlConn.setDoInput(true);
+
+		// Let the RTS know that we want to do output.
+		urlConn.setDoOutput(true);
+
+		// No caching, we want the real thing.
+		urlConn.setUseCaches(false);
+
+		// Specify the content type.
+		urlConn.setRequestProperty("Content-Type",
+				"application/x-www-form-urlencoded");
+
+		// Send POST output.
+		printout = new DataOutputStream(urlConn.getOutputStream());
+		String content = "resformat=raw&docid=" + URLEncoder.encode(docid, "utf8");
+		printout.writeBytes(content);
+		printout.flush();
+		printout.close();
+
+		// Get response data.
+		br = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+
 		while (br.ready()) {
 			String line = br.readLine();
-			if (!line.matches("^\\s*#.+$")) { // must not be a commented line
-				String[] cols = line.split("\t");
-				
-				if( "".equals( cols[0] ) || "".equals( cols[1] ) ){
-					continue;
-				}
-				
-				// columns
-				// id    annotation-type    offset    type    code    score    docid    literal
-				// 0     1                  2         3       4       5        6        7
-				
-				String id = cols[0];
-				int start = Integer.parseInt(cols[2]);
-				String literal = cols[7];
-				int end = start + literal.length();
-
-				Match match = new Match();
-				match.setStart(start);
-				match.setEnd(end);
-				match.setString(literal);
-				
-				sortedMatches.add(match);
+			
+			if (line.matches("^\\s*#.+$")) { // must not be a commented line
+				continue;
 			}
-		}
-		br.close();
+			
+			String[] cols = line.split("\t");
+			
+			// columns
+			// id    annotation-type    offset    type    code    score    docid    literal
+			// 0     1                  2         3       4       5        6        7
+			
+			String id = cols[0];
+			int start = Integer.parseInt(cols[2]);
+			String literal = cols[7];
+			int end = start + literal.length();
 
+			Match match = new Match();
+			match.setStart(start);
+			match.setEnd(end);
+			match.setString(literal);
+			
+			sortedMatches.add(match);
+			
+		}
+		
 		for (Match m : sortedMatches) {
 			matches.add(m);
 		}
+		
+		// ENND COPY
+		
+//		URL url = new URL(
+//				"http://factoid.bioinfo.cnio.es/Factoid/abner?resformat=raw&docid="
+//						+ docid);
+//
+//		BufferedReader br = new BufferedReader(new InputStreamReader(
+//				url.openStream()));
+//		while (br.ready()) {
+//			String line = br.readLine();
+//			if (!line.matches("^\\s*#.+$")) { // must not be a commented line
+//				String[] cols = line.split("\t");
+//				
+//				if( "".equals( cols[0] ) || "".equals( cols[1] ) ){
+//					continue;
+//				}
+//				
+//				// columns
+//				// id    annotation-type    offset    type    code    score    docid    literal
+//				// 0     1                  2         3       4       5        6        7
+//				
+//				String id = cols[0];
+//				int start = Integer.parseInt(cols[2]);
+//				String literal = cols[7];
+//				int end = start + literal.length();
+//
+//				Match match = new Match();
+//				match.setStart(start);
+//				match.setEnd(end);
+//				match.setString(literal);
+//				
+//				sortedMatches.add(match);
+//			}
+//		}
+//		br.close();
+//
+//		for (Match m : sortedMatches) {
+//			matches.add(m);
+//		}
 
 		return matches;
 	}
@@ -96,7 +161,7 @@ public class NormalizationService {
 
 		// Send POST output.
 		printout = new DataOutputStream(urlConn.getOutputStream());
-		String content = "_format=raw&text=" + URLEncoder.encode(text, "utf8");
+		String content = "resformat=raw&text=" + URLEncoder.encode(text, "utf8");
 		printout.writeBytes(content);
 		printout.flush();
 		printout.close();
