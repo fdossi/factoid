@@ -26,9 +26,13 @@
 <Body:>
   <body class="">
 
-  <app:help stage="textmining" icon="icon-arrow-right">
+  <app:help stage="textmining" icon="icon-arrow-right" number="1">
 
-  <app:help stage="entities" icon="icon-arrow-right">
+  <div class="popover-hidden-{not(_showTextmining)} popover-animated-{bool(_showTextminingAnimated)}">
+    <app:help stage="organisms" icon="icon-arrow-right" number="2">
+  </div>
+
+  <app:help stage="entities" icon="icon-arrow-right" number="3">
 
   <div class="help-content" data-for-stage="textmining">
     <h2>Enter abstract</h2>
@@ -172,7 +176,7 @@
   </div>
 
 <textmining:>
-  <div id="textmining-input">
+  <div id="textmining-input" class="clearfix">
     <div class="info">
       <span class="icon-info-sign"></span> The text you enter here will be analyzed by Factoid to find interactions involving genes and their products.
     </div>
@@ -187,6 +191,10 @@
 
     <textarea id="textmining-text"></textarea>
 
+    <div class="buttons">
+      <button class="add"><span class="icon-plus"></span><span class="icon-circle"></span><span class="icon-stop"></span> Add to document</button>
+    </div>
+
     <div class="organism-preview">
       <label>Relevant organisms:</label>
       <div class="organisms">
@@ -197,12 +205,6 @@
         {/if}
       </div>
     </div>
-
-    <div class="buttons">
-      <button class="add"><span class="icon-plus"></span><span class="icon-circle"></span><span class="icon-stop"></span> Add to document</button>
-    </div>
-
-    <app:help stage="organisms" icon="icon-arrow-up">
 
   </div>
 
@@ -295,6 +297,7 @@
 
     <div class="indicator">
       <span class="{{@icon}}"></span>
+      <span class="number">{{@number}}</span>
     </div>
   </div>
 
